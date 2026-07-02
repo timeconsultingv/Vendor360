@@ -142,20 +142,26 @@ export default function CompaniesPage() {
                 {c.summary || 'ยังไม่มีข้อมูลสรุป...'}
               </p>
 
-              {c.tags && c.tags.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mb-5">
-                  {c.tags.slice(0, 3).map((tag, i) => (
-                    <span key={i} className="text-[10px] px-2 py-1 bg-slate-100 text-slate-600 rounded-md font-medium">
-                      {tag}
-                    </span>
-                  ))}
-                  {c.tags.length > 3 && (
-                    <span className="text-[10px] px-2 py-1 bg-slate-50 text-slate-400 rounded-md font-medium">
-                      +{c.tags.length - 3}
-                    </span>
-                  )}
-                </div>
-              )}
+              <div className="flex flex-wrap gap-1.5 mb-5">
+                {c.tags && c.tags.length > 0 ? (
+                  <>
+                    {c.tags.slice(0, 3).map((tag, i) => (
+                      <span key={i} className="text-[10px] px-2 py-1 bg-slate-100 text-slate-600 rounded-md font-medium">
+                        {tag}
+                      </span>
+                    ))}
+                    {c.tags.length > 3 && (
+                      <span className="text-[10px] px-2 py-1 bg-slate-50 text-slate-400 rounded-md font-medium">
+                        +{c.tags.length - 3}
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  <span className="text-[10px] px-2 py-1 bg-slate-50 text-slate-400 rounded-md font-medium border border-slate-100 border-dashed">
+                    ยังไม่มีแท็กโดเมน
+                  </span>
+                )}
+              </div>
 
               <div className="flex items-center justify-between text-xs text-slate-500 pt-4 border-t border-slate-100 relative z-10">
                 <div className="flex items-center gap-4">
