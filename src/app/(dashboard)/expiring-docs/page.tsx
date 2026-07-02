@@ -127,8 +127,8 @@ export default function ExpiringDocsPage() {
                 return (
                   <tr key={doc.id} className="hover:bg-slate-50">
                     <td className="p-4 font-bold text-blue-600">
-                      <Link href={`/companies/${doc.companyId}`} className="hover:underline">
-                        {doc.companyName}
+                      <Link href={`/companies/detail?id=${doc.companyId}`} className="hover:underline">
+                        <span className="font-bold">{doc.companyName}</span>
                       </Link>
                     </td>
                     <td className="p-4">

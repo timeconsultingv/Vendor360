@@ -4,14 +4,15 @@ import { useEffect, useState, use } from 'react';
 import { db, storage } from '@/lib/firebase/config';
 import { doc, getDoc, collection, onSnapshot, addDoc, deleteDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, Building2, MapPin, Globe, Phone, Mail, Edit, Trash, Plus, ShieldAlert, FileSignature, Briefcase, Users, Download, ExternalLink, Star } from 'lucide-react';
 import { toast } from 'sonner';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export default function CompanyDetailPage({ params }: { params: Promise<{ id: string }> }) {
+function CompanyDetailContent() {
   const router = useRouter();
-  const { id } = use(params);
+  const searchParams = useSearchParams();
+  const id = searchParams.get('id');
   const [company, setCompany] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('profile');
@@ -33,6 +34,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
 
   useEffect(() => {
     const fetchCompany = async () => {
+      if (!id) return;
       const docSnap = await getDoc(doc(db, 'companies', id));
       if (docSnap.exists()) {
         setCompany({ id: docSnap.id, ...docSnap.data() });
@@ -45,6 +47,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
 
     fetchCompany();
 
+    if (!id) return;
     const unsubProjects = onSnapshot(collection(db, 'companies', id, 'projects'), (snap) => setProjects(snap.docs.map(d => ({ id: d.id, ...d.data() }))));
     const unsubStaff = onSnapshot(collection(db, 'companies', id, 'staff'), (snap) => setStaff(snap.docs.map(d => ({ id: d.id, ...d.data() }))));
     const unsubRisks = onSnapshot(collection(db, 'companies', id, 'risks'), (snap) => setRisks(snap.docs.map(d => ({ id: d.id, ...d.data() }))));
@@ -140,7 +143,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
           <button onClick={() => router.push('/companies')} className="p-2.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full hover:bg-white/20 transition text-white">
             <ArrowLeft size={20} />
           </button>
-          <button onClick={() => router.push(`/companies/${company.id}/edit`)} className="px-5 py-2.5 bg-white text-blue-900 rounded-full hover:bg-blue-50 transition font-bold text-sm flex items-center gap-2 shadow-lg">
+          <button onClick={() => router.push(`/companies/edit?id=${company.id}`)} className="px-5 py-2.5 bg-white text-blue-900 rounded-full hover:bg-blue-50 transition font-bold text-sm flex items-center gap-2 shadow-lg">
             <Edit size={16} /> แก้ไขข้อมูล
           </button>
         </div>
@@ -460,5 +463,14 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
         )}
       </div>
     </div>
+  );
+}
+
+import { Suspense } from 'react';
+export default function CompanyDetailPage() {
+  return (
+    <Suspense fallback={<div className="p-10 text-center">Loading...</div>}>
+      <CompanyDetailContent />
+    </Suspense>
   );
 }

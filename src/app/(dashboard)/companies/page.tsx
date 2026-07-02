@@ -99,7 +99,7 @@ export default function CompaniesPage() {
           return (
             <div 
               key={c.id} 
-              onClick={() => router.push(`/companies/${c.id}`)}
+              onClick={() => router.push(`/companies/detail?id=${c.id}`)}
               className="bg-white p-6 rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/40 hover:-translate-y-1 transition-transform duration-300 cursor-pointer group flex flex-col relative overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-slate-50 to-white rounded-bl-full -z-10 group-hover:scale-110 transition-transform duration-500"></div>
@@ -135,7 +135,7 @@ export default function CompaniesPage() {
                 </div>
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
                   <button 
-                    onClick={(e) => { e.stopPropagation(); router.push(`/companies/${c.id}/edit`); }}
+                    onClick={(e) => { e.stopPropagation(); router.push(`/companies/edit?id=${c.id}`); }}
                     className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded"
                   >
                     <Edit size={16} />

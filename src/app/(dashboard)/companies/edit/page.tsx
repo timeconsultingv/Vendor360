@@ -3,20 +3,22 @@
 import { useEffect, useState, use } from 'react';
 import CompanyForm from '@/components/companies/CompanyForm';
 import { ArrowLeft } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import { toast } from 'sonner';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export default function EditCompanyPage({ params }: { params: Promise<{ id: string }> }) {
+function EditCompanyContent() {
   const router = useRouter();
-  const { id } = use(params);
+  const searchParams = useSearchParams();
+  const id = searchParams.get('id');
   const [initialData, setInitialData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCompany = async () => {
+      if (!id) return;
       try {
         const docRef = doc(db, 'companies', id);
         const docSnap = await getDoc(docRef);
@@ -55,7 +57,16 @@ export default function EditCompanyPage({ params }: { params: Promise<{ id: stri
         </div>
       </div>
       
-      {initialData && <CompanyForm initialData={initialData} isEdit={true} id={id} />}
+      {initialData && id && <CompanyForm initialData={initialData} isEdit={true} id={id} />}
     </div>
+  );
+}
+
+import { Suspense } from 'react';
+export default function EditCompanyPage() {
+  return (
+    <Suspense fallback={<div className="p-10 text-center">Loading...</div>}>
+      <EditCompanyContent />
+    </Suspense>
   );
 }
