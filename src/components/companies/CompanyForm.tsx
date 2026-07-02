@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { db } from '@/lib/firebase/config';
-import { doc, setDoc, updateDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, updateDoc, collection, serverTimestamp, addDoc } from 'firebase/firestore';
 import { toast } from 'sonner';
 import { Trash } from 'lucide-react';
+import { useAuth } from '@/lib/contexts/AuthContext';
 
 interface Contact {
   name: string;
@@ -36,6 +37,7 @@ interface CompanyData {
 
 export default function CompanyForm({ initialData, isEdit, id }: { initialData?: CompanyData, isEdit?: boolean, id?: string }) {
   const router = useRouter();
+  const { profile } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -107,10 +109,28 @@ export default function CompanyForm({ initialData, isEdit, id }: { initialData?:
 
       if (isEdit && id) {
         await updateDoc(doc(db, 'companies', id), payload);
+        
+        await addDoc(collection(db, 'timeline'), {
+          type: 'update',
+          text: `อัปเดตข้อมูล Partner: ${payload.name}`,
+          time: new Date().toLocaleString('th-TH'),
+          user: profile?.name || profile?.email || 'Unknown User',
+          timestamp: serverTimestamp()
+        });
+        
         toast.success('อัปเดตข้อมูลสำเร็จ');
       } else {
         const newRef = doc(collection(db, 'companies'));
         await setDoc(newRef, { ...payload, created_at: serverTimestamp() });
+        
+        await addDoc(collection(db, 'timeline'), {
+          type: 'add',
+          text: `เพิ่ม Partner ใหม่: ${payload.name}`,
+          time: new Date().toLocaleString('th-TH'),
+          user: profile?.name || profile?.email || 'Unknown User',
+          timestamp: serverTimestamp()
+        });
+        
         toast.success('บันทึกข้อมูล Partner ใหม่สำเร็จ');
       }
       

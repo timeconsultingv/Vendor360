@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
+import { collection, onSnapshot, deleteDoc, doc, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import { Search, MapPin, Globe, ChevronRight, Trash, Edit, Star } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
+import { useAuth } from '@/lib/contexts/AuthContext';
 
 interface CompanyData {
   id: string;
@@ -26,6 +27,7 @@ export default function CompaniesPage() {
   const [companies, setCompanies] = useState<CompanyData[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const { profile } = useAuth();
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
 
@@ -48,6 +50,15 @@ export default function CompaniesPage() {
     if (confirm(`คุณต้องการลบข้อมูล "${name}" อย่างถาวรใช่หรือไม่?`)) {
       try {
         await deleteDoc(doc(db, 'companies', id));
+        
+        await addDoc(collection(db, 'timeline'), {
+          type: 'alert',
+          text: `ลบ Partner: ${name}`,
+          time: new Date().toLocaleString('th-TH'),
+          user: profile?.name || profile?.email || 'Unknown User',
+          timestamp: serverTimestamp()
+        });
+        
         toast.success(`ลบ ${name} สำเร็จ`);
         // TODO: Log timeline
       } catch (error: unknown) {
