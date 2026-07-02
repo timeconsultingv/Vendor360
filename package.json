@@ -9,7 +9,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@netlify/plugin-nextjs": "^5.15.12",
     "clsx": "^2.1.1",
     "firebase": "^12.15.0",
     "firebase-admin": "^14.1.0",
